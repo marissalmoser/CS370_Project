@@ -50,7 +50,6 @@ $import_error_message = "";
 
 }
 ?>
-    <h1> Pizza Data Import</h1>
 <?php
 
 if($import_attempted){
