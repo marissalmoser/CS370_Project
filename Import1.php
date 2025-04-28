@@ -10,6 +10,7 @@ include 'header.php';
     </div>
 
 <?php
+
 mysqli_report(MYSQLI_REPORT_ERROR);
 $import_attempted = false;
 $import_successful = false;
@@ -20,11 +21,11 @@ $import_error_message = "";
         //echo "Posted!!!\n";
         $import_attempted = true;
 
-        $con = @mysqli_connect("localhost","pizza_user","","acadia");
+        $mysqli = new mysqli("localanchor","root","root3","news");
 
-        if(mysqli_connect_errno()){
-        {
-            $import_error_message = "Failed to connect to MySQL: " . mysqli_connect_error();
+        if ($mysqli -> connect_errno) {
+            echo "Failed to connect to MySQL: " . $mysqli -> connect_error;
+            exit();
         }
     }
     else
@@ -44,13 +45,11 @@ $import_error_message = "";
         catch(Error $e)
         {
             $import_error_message = $e->getMessage() . " at: " . $e->getFile() . " line " . $e->getLine() ."<br/>";
-
         }
     }
 
-}
 ?>
-    <h1> Pizza Data Import</h1>
+
 <?php
 
 if($import_attempted){
