@@ -5,18 +5,18 @@ include 'header.php';
     <!DOCTYPE html>
 
     <div class="container">
-        <h1>Story </h1>
-        <p>This is the report 1 page.</p>
+        <h1>Story Comments</h1>
+        <p>This page reports on all comments on this site. It shows all stories and whatever comments they have.</p>
     </div>
 
 <!--example table-->
     <table class="table table-striped">
         <thead>
         <tr>
-            <th scope="col">#</th>
-            <th scope="col">First</th>
-            <th scope="col">Last</th>
-            <th scope="col">Handle</th>
+            <th scope="col">Title</th>
+            <th scope="col">Body Text</th>
+            <th scope="col">Published Timestamp</th>
+            <th scope="col">Comic URL</th>
         </tr>
         </thead>
         <tbody>
@@ -45,9 +45,9 @@ include 'header.php';
 $connection_error = false;
 $connection_error_message = "";
 
-$con = @mysqli_connect("localhost", "root", "root3", "news");
+$con = mysqli_connect("localhost", "root", "SQLP@ss");
 
-if(mysqli_connect_errno()) {
+if(!$con) {
     $connection_error = true;
     $connection_error_message = "Failed to connect to MySql " . mysqli_connect_error();
 }
@@ -94,9 +94,10 @@ function output_error($title, $error)
     {
         echo "<table\n";
         echo "<tr>\n";
-        echo "<td>Name</td>\n";
-        echo "<td>Age</td>\n";
-        echo "<td>Gender</td>\n";
+        echo "<td>Title</td>\n";
+        echo "<td>Body Text</td>\n";
+        echo "<td>Published Timestamp</td>\n";
+        echo "<td>Comic URL</td>\n";
         echo "</tr>";
     }
 
