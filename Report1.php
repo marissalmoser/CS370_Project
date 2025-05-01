@@ -5,7 +5,7 @@ include 'header.php';
     <!DOCTYPE html>
 
     <div class="container">
-        <h1>Welcome to My Website</h1>
+        <h1>Story </h1>
         <p>This is the report 1 page.</p>
     </div>
 
@@ -45,7 +45,7 @@ include 'header.php';
 $connection_error = false;
 $connection_error_message = "";
 
-$con = @mysqli_connect("localhost", "pizza_user", "pizzapizza", "pizza_db");
+$con = @mysqli_connect("localhost", "root", "root3", "news");
 
 if(mysqli_connect_errno()) {
     $connection_error = true;
@@ -59,17 +59,8 @@ function output_error($title, $error)
     echo "<h4>" . $error . "</h4>\n";
     echo "</span>\n";
 }
+
 ?>
-
-    <html>
-    <head>
-        <title>Pizza Data Report</title>
-    </head>
-
-    </html>
-
-<?php(include_once("header.php")); ?>
-
     <style>
         .pizzaDataTable{
             font-family : Calibri, monospace;
@@ -77,7 +68,7 @@ function output_error($title, $error)
             border-spacing : 0
         }
         .pizzaDataHeaderRow td{
-            font-weight : bold, padding-right : 20px
+            font-weight : bold padding-right : 20px
 
         }
         .pizzaDataRow td
@@ -93,48 +84,45 @@ function output_error($title, $error)
             background-color : #cccccc;
         }
     </style>
+<?php
     if($connection_error) {
-    output_error("Database Connection Error! " . $connection_error_message);
+        output_error("Database Connection Error! " . $connection_error_message);
     }
     else
     {
-    function output_table_open()
+        function output_table_open()
     {
-    echo "<table\n";
-    echo "<tr>\n";
-    echo "<td>Name</td>\n";
-    echo "<td>Age</td>\n";
-    echo "<td>Gender</td>\n";
-    echo "</tr>";
+        echo "<table\n";
+        echo "<tr>\n";
+        echo "<td>Name</td>\n";
+        echo "<td>Age</td>\n";
+        echo "<td>Gender</td>\n";
+        echo "</tr>";
     }
 
     function output_table_close()
     {
-    echo "</table>\n";
+        echo "</table>\n";
     }
 
     function output_person_row($name, $age, $gender)
     {
-    echo "<tr class>\n";
-    echo "<td> . $name . </td>";
-    echo "<td>" . $age . "</td>";
-    echo "<td>" . $gender . "</td>";
-    echo "</tr>\n";
+        echo "<tr class>\n";
+        echo "<td> . $name . </td>";
+        echo "<td>" . $age . "</td>";
+        echo "<td>" . $gender . "</td>";
+        echo "</tr>\n";
     }
 
 
 
-    $query = " SELECT t0.mame, t0.age, t0.gender, t1.pizza, t2.pizzeria"
-    . " FROM Person t0"
-    . " LEFT OUTER JOIN Eats t1 on t0.name = t1.name"
-    . " LEFT OUTER JOIN Frequents t2 on t1.name = t2.name"
-    . " ORDER BY t0.name, t1.pizza, t2.pizzeria";
+    $query = "SELECT * FROM Author";
     $result = mysqli_query($con, $query);
     // used for selects, inserts, updates, and deletes
 
     if(!$result) {
     if(mysqli_errno($con)) {
-    output_error("Database retrieval Failed! " . mysqli_error($con));
+        output_error("Database retrieval Failed! " . mysqli_error($con));
     }
     else
     {
