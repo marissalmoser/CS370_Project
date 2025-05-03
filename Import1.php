@@ -6,12 +6,11 @@ include 'header.php';
 
 <div class="container">
     <h1>Welcome to My Website</h1>
-    <p>This is the import 1 page. Here you can import author data.</p>
+    <p>This is the import 1 page. Here you can import story, user, and comment data.</p>
 </div>
 
-<!--connect to server-->
 <?php
-
+//connect to server
 mysqli_report(MYSQLI_REPORT_ERROR);
 $import_attempted = false;
 $import_successful = false;
@@ -19,7 +18,6 @@ $import_error_message = "";
 
 if($_SERVER["REQUEST_METHOD"] == 'POST')
 {
-
     $import_attempted = true;
 
     $mysqli = new mysqli("localhost", "root", "root3", "news");
@@ -32,43 +30,113 @@ if($_SERVER["REQUEST_METHOD"] == 'POST')
     else
     {
         try {
-            //set up file to read
-            $contents = file_get_contents($_FILES["importFile"]["tmp_name"]);
-            $lines = explode("\n", $contents);
-            $headers = str_getcsv(array_shift($lines), ",", '"', "\\");
-            $sql = "INSERT INTO author (PenName, Bio, Degree, Birthday)
-                    VALUES (?, ?, ?, ?)
-                    ON DUPLICATE KEY UPDATE
-                        Bio = VALUES(Bio),
-                        Degree = VALUES(Degree),
-                        Birthday = VALUES(Birthday)";
+            // Open and read the uploaded CSV
+            $handle = fopen($_FILES["importFile"]["tmp_name"], "r");
+            $headers = fgetcsv($handle, $length = null, $separator = ',', $enclosure = '"', $escape = '\\');
 
-            $stmt = $mysqli->prepare($sql);
+            //store data from each line in these variables
+            while (($data = fgetcsv($handle, $length = null, $separator = ',', $enclosure = '"', $escape = '\\')) !== false) {
+                list(
+                    $displayName,
+                    $email,
+                    $password,
+                    $role,
+                    $subscriptionStatus,
+                    $dateJoined,
+                    $storyTitle,
+                    $storyBody,
+                    $publishedTimestamp,
+                    $comicUrl,
+                    $commentText,
+                    $commentTimestamp
+                    ) = $data;
 
-            foreach ($lines as $line)
-            {
-                // skip empty lines
-                if (trim($line) === '')
+                // skip blank or all-empty rows
+                if (empty(array_filter($data))) {
                     continue;
-                $parsed = str_getcsv($line, ",", '"', "\\");
+                }
 
-                // Sanity check: make sure we have all 4 fields
-                if (count($parsed) < 4) continue;
-
-                //assign variables from data
-                $penName = trim($parsed[0]);
-                $bio = trim($parsed[1]);
-                $degree = trim($parsed[2]);
-
-                $rawBirthday = trim($parsed[3]);
-                $birthday = date('Y-m-d', strtotime($rawBirthday));
-
-                //put data into query
-                $stmt->bind_param("ssss", $penName, $bio, $degree, $birthday);
+                // ---------- Insert/Update USER ----------
+                $stmt = $mysqli->prepare("SELECT UserID FROM User WHERE DisplayName = ?");
+                $stmt->bind_param("s", $displayName);
                 $stmt->execute();
+                $stmt->bind_result($userID);
+
+                if (!$stmt->fetch()) {
+                    //User doesn't exist, insert it
+                    $stmt->close();
+                    $stmt = $mysqli->prepare("INSERT INTO User 
+                        (SubscriptionStatus, DisplayName, Email, Password, DateJoined, Role)
+                        VALUES (?, ?, ?, ?, ?, ?)");
+                    $stmt->bind_param("ssssss", $subscriptionStatus, $displayName, $email, $password, $dateJoined, $role);
+                    $stmt->execute();
+                    $userID = $stmt->insert_id;
+                } else {
+                    //User already exists — update
+                    $stmt->close();
+
+                    //Update the existing records
+                    $stmt = $mysqli->prepare("UPDATE User
+                              SET SubscriptionStatus = ?, Email = ?, Password = ?, dateJoined = ?, Role = ? 
+                              WHERE UserID = ?");
+                    $stmt->bind_param("ssssss", $subscriptionStatus, $email, $password, $dateJoined, $role, $userID);
+                    $stmt->execute();
+                }
+
+                // ---------- Insert/Update STORY  ----------
+                $stmt = $mysqli->prepare("SELECT StoryID FROM Story WHERE Title = ?");
+                $stmt->bind_param("s", $storyTitle);
+                $stmt->execute();
+                $stmt->bind_result($storyID);
+
+                if (!$stmt->fetch()) {
+                    //Story doesn't exist, insert it
+                    $stmt->close();
+                    $stmt = $mysqli->prepare("INSERT INTO Story (Title, Body, PublishedTimestamp, ComicURL)
+                                  VALUES (?, ?, ?, ?)");
+                    $stmt->bind_param("ssss", $storyTitle, $storyBody, $publishedTimestamp, $comicUrl);
+                    $stmt->execute();
+                    $storyID = $stmt->insert_id;
+                } else {
+                    //Story already exists — update
+                    $stmt->close();
+
+                    //Update the existing records
+                    $stmt = $mysqli->prepare("UPDATE Story
+                              SET Body = ?, PublishedTimestamp = ?, ComicURL = ?
+                              WHERE StoryID = ?");
+                    $stmt->bind_param("ssss", $storyBody, $publishedTimestamp, $comicUrl, $storyID);
+                    $stmt->execute();
+                }
+
+                // ---------- Insert/Update COMMENT ----------
+                $stmt = $mysqli->prepare("SELECT 1 FROM Comment WHERE UserID = ? AND StoryID = ? AND Timestamp = ?");
+                $stmt->bind_param("iis", $userID, $storyID, $commentTimestamp);
+                $stmt->execute();
+                $stmt->store_result();
+
+                if ($stmt->num_rows === 0) {
+                    //Comment doesn't exist, insert it
+                    $stmt->close();
+                    $stmt = $mysqli->prepare("INSERT INTO Comment (UserID, StoryID, Timestamp, CommentText)
+                              VALUES (?, ?, ?, ?)");
+                    $stmt->bind_param("iiss", $userID, $storyID, $commentTimestamp, $commentText);
+                    $stmt->execute();
+                } else {
+                    //Comment already exists — update
+                    $stmt->close();
+
+                    //Update the existing comment text
+                    $stmt = $mysqli->prepare("UPDATE Comment
+                              SET CommentText = ?
+                              WHERE UserID = ? AND StoryID = ? AND Timestamp = ?");
+                    $stmt->bind_param("siis", $commentText, $userID, $storyID, $commentTimestamp);
+                    $stmt->execute();
+                }
             }
 
-            $stmt->close();
+            fclose($handle);
+            $mysqli->close();
             $import_successful = true;
         }
         catch (Error $e)
@@ -77,16 +145,28 @@ if($_SERVER["REQUEST_METHOD"] == 'POST')
         }
     }
 }
+
 ?>
 
-
-<!--success and fail messages-->
+    <!--form html-->
+    <br><br>
+    <form method = "post" enctype = "multipart/form-data">
+        <div class = "input-group mb-3">
+            File: <input type = "file" name = "importFile" />
+            <br><br>
+            <input type ="submit" value ="Upload Data" />
+        </div>
+    </form>
 
 <?php
+//success and fail messages
 if($import_attempted){
     if($import_successful){
         ?>
-        <h1><span class="text-success"> Import Succeeded! </span></h1>
+        <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+            <strong>Success!</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
         <?php
     }
     else
@@ -99,15 +179,5 @@ if($import_attempted){
     }
 }
 ?>
-
-<!--form-->
-<br><br>
-<form method = "post" enctype = "multipart/form-data">
-    <div class = "input-group mb-3">
-        File: <input type = "file" name = "importFile" />
-        <br><br>
-        <input type ="submit" value ="Upload Data" />
-    </div>
-</form>
 
 <?php include_once("footer.php"); ?>
