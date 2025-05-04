@@ -32,7 +32,8 @@ function output_story_row($story) {
         <td>{$story['Title']}</td>
         <td>{$story['Body']}</td>
         <td>{$story['PublishedTimestamp']}</td>
-        <td><a href='{$story['ComicURL']}' target='_blank'>Comic Link</a></td>
+       <td><a href='{$story['ComicURL']}' target='_blank'>{$story['ComicURL']}</a></td>
+
     </tr>\n";
 }
 
