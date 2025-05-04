@@ -4,6 +4,7 @@ mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 // Drop existing tables, weak entities first
 $dropTables = [
+    "DROP TABLE IF EXISTS EventTag",
     "DROP TABLE IF EXISTS Comment",
     "DROP TABLE IF EXISTS Event",
     "DROP TABLE IF EXISTS AdvertisementStory",
@@ -102,25 +103,20 @@ $createTables = [
     "CREATE TABLE IF NOT EXISTS `news`.`Event` (
       `EventID` INT NOT NULL AUTO_INCREMENT,
       `Sponsor` VARCHAR(30) NOT NULL,
-      `TagID` INT NOT NULL,
       `LocationID` INT NOT NULL,
       `EventStart` DATETIME NOT NULL,
       `EventEnd` DATETIME NOT NULL,
       `Description` VARCHAR(600) NOT NULL,
       `EventName` VARCHAR(30) NOT NULL,
       PRIMARY KEY (`EventID`),
-      INDEX `TagID_idx` (`TagID` ASC) VISIBLE,
+      UNIQUE INDEX `EventName_UNIQUE` (`EventName` ASC) VISIBLE,
       INDEX `LocationID_idx` (`LocationID` ASC) VISIBLE,
-      CONSTRAINT `TagID`
-        FOREIGN KEY (`TagID`)
-        REFERENCES `news`.`Tag` (`TagID`)
-        ON DELETE NO ACTION
-        ON UPDATE NO ACTION,
       CONSTRAINT `LocationID`
         FOREIGN KEY (`LocationID`)
         REFERENCES `news`.`Location` (`LocationID`)
         ON DELETE NO ACTION
-        ON UPDATE NO ACTION)
+        ON UPDATE NO ACTION
+    )
     ENGINE = InnoDB;",
 
     "CREATE TABLE IF NOT EXISTS `news`.`AdvertisementStory` (
@@ -170,6 +166,23 @@ $createTables = [
         ON DELETE NO ACTION
         ON UPDATE NO ACTION,
       CONSTRAINT `TagID2`
+        FOREIGN KEY (`TagID`)
+        REFERENCES `news`.`Tag` (`TagID`)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION)
+    ENGINE = InnoDB;",
+
+        "CREATE TABLE IF NOT EXISTS `news`.`EventTag` (
+      `EventID` INT NOT NULL,
+      `TagID` INT NOT NULL,
+      PRIMARY KEY (`EventID`, `TagID`),
+      INDEX `TagID_idx` (`TagID` ASC, `EventID` ASC) VISIBLE,
+      CONSTRAINT `EventID`
+        FOREIGN KEY (`EventID`)
+        REFERENCES `news`.`Event` (`EventID`)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION,
+      CONSTRAINT `TagID3`
         FOREIGN KEY (`TagID`)
         REFERENCES `news`.`Tag` (`TagID`)
         ON DELETE NO ACTION

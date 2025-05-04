@@ -134,31 +134,50 @@ if($_SERVER["REQUEST_METHOD"] == 'POST')
 
                 // ---------- Insert/Update EVENT ----------
                 //check for data's existence
-                $stmt = $mysqli->prepare("SELECT 1 FROM event WHERE TagID = ? AND LocationID = ?");
-                $stmt->bind_param("ii", $tagID, $locationID);
+                $stmt = $mysqli->prepare("SELECT EventID FROM event WHERE EventName = ?");
+                $stmt->bind_param("s", $eventName);
+                $stmt->execute();
+                $stmt->store_result();
+                $stmt->bind_result($eventID);
+                $stmt->fetch();
+
+                if ($stmt->num_rows === 0)
+                {
+                    //event doesn't exist, insert it
+                    $stmt->close();
+                    $stmt = $mysqli->prepare("INSERT INTO event (LocationID, Sponsor, EventStart, EventEnd, Description, EventName)
+                              VALUES (?, ?, ?, ?, ?, ?)");
+                    $stmt->bind_param("isssss", $locationID, $sponsor, $eventStartTime, $eventEndTime, $description, $eventName);
+                    $stmt->execute();
+                    $eventID = $stmt->insert_id;
+                }
+                else
+                {
+                    //event already exists — update
+                    $stmt->close();
+                    //Update the existing comment text
+                    $stmt = $mysqli->prepare("UPDATE event
+                              SET Sponsor = ?, EventStart = ?, EventEnd = ?, Description = ?, LocationID = ?
+                              WHERE EventName = ?");
+                    $stmt->bind_param("ssssis", $sponsor, $eventStartTime, $eventEndTime, $description, $locationID, $eventName);
+                    $stmt->execute();
+                }
+
+                // ---------- Insert/Update EVENT TAG ----------
+                //check for data's existence
+                $stmt = $mysqli->prepare("SELECT 1 FROM eventtag WHERE TagID = ? AND EventID = ?");
+                $stmt->bind_param("ii", $tagID, $eventID);
                 $stmt->execute();
                 $stmt->store_result();
 
                 if ($stmt->num_rows === 0)
                 {
-                    //Comment doesn't exist, insert it
-                    $stmt->close();
-                    $stmt = $mysqli->prepare("INSERT INTO event (TagID, LocationID, Sponsor, EventStart, EventEnd, Description, EventName)
-                              VALUES (?, ?, ?, ?, ?, ?, ?)");
-                    $stmt->bind_param("iisssss", $tagID, $locationID, $sponsor, $eventStartTime, $eventEndTime, $description, $eventName);
-                    $stmt->execute();
-                }
-                else
-                {
-                    //Comment already exists — update
-                    $stmt->close();
-
-                    //Update the existing comment text
-                    $stmt = $mysqli->prepare("UPDATE event
-                              SET Sponsor = ?, EventStart = ?, EventEnd = ?, Description = ?, EventName = ?
-                              WHERE TagID = ? AND LocationID = ?");
-                    $stmt->bind_param("sssssii", $sponsor, $eventStartTime, $eventEndTime, $description, $eventName, $tagID, $locationID);
-                    $stmt->execute();
+                //event tag doesn't exist, insert it
+                $stmt->close();
+                $stmt = $mysqli->prepare("INSERT INTO eventtag (EventID, TagID)
+                              VALUES (?, ?)");
+                $stmt->bind_param("ii",$eventID, $tagID);
+                $stmt->execute();
                 }
             }
 
