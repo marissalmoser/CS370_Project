@@ -6,7 +6,7 @@
 </div>
 
 <?php
-$conn = mysqli_connect("localhost", "root", "sqlpassword_1", "news", 3300);
+$conn = mysqli_connect("localhost", "root", "sqlpassword_1", "news");
 
 if (!$conn) {
     die("<div class='alert alert-danger'>Connection Error: " . mysqli_connect_error() . "</div>");
