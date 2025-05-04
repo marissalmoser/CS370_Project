@@ -3,10 +3,21 @@ include 'header.php';
 ?>
 
 <!DOCTYPE html>
+<!--header-->
+<div class="bg-primary-subtle p-4"> <br>
+    <div class="container hei">
+    <h1>Import Process 1: <small class="text-body-secondary">User, Story, Comment</small> </h1>
+    <br>
+    <p>This is the import 1 page. Here you can import user, story, and comment data.</p>
+    <br>
+    <br>
+    <br>
+    <br>
+    </div>
 
-<div class="container">
-    <h1>Welcome to My Website</h1>
-    <p>This is the import 1 page. Here you can import story, user, and comment data.</p>
+    <?php
+    include 'ImportsHeader.php';
+    ?>
 </div>
 
 <?php
@@ -29,30 +40,33 @@ if($_SERVER["REQUEST_METHOD"] == 'POST')
     }
     else
     {
-        try {
+        try
+        {
             // Open and read the uploaded CSV
             $handle = fopen($_FILES["importFile"]["tmp_name"], "r");
             $headers = fgetcsv($handle, $length = null, $separator = ',', $enclosure = '"', $escape = '\\');
 
             //store data from each line in these variables
-            while (($data = fgetcsv($handle, $length = null, $separator = ',', $enclosure = '"', $escape = '\\')) !== false) {
+            while (($data = fgetcsv($handle, $length = null, $separator = ',', $enclosure = '"', $escape = '\\')) !== false)
+            {
                 list(
-                    $displayName,
+                    $displayName, //user
                     $email,
                     $password,
                     $role,
                     $subscriptionStatus,
                     $dateJoined,
-                    $storyTitle,
+                    $storyTitle, //story
                     $storyBody,
                     $publishedTimestamp,
                     $comicUrl,
-                    $commentText,
+                    $commentText, //comment
                     $commentTimestamp
                     ) = $data;
 
                 // skip blank or all-empty rows
-                if (empty(array_filter($data))) {
+                if (empty(array_filter($data)))
+                {
                     continue;
                 }
 
@@ -62,7 +76,8 @@ if($_SERVER["REQUEST_METHOD"] == 'POST')
                 $stmt->execute();
                 $stmt->bind_result($userID);
 
-                if (!$stmt->fetch()) {
+                if (!$stmt->fetch())
+                {
                     //User doesn't exist, insert it
                     $stmt->close();
                     $stmt = $mysqli->prepare("INSERT INTO User 
@@ -71,7 +86,9 @@ if($_SERVER["REQUEST_METHOD"] == 'POST')
                     $stmt->bind_param("ssssss", $subscriptionStatus, $displayName, $email, $password, $dateJoined, $role);
                     $stmt->execute();
                     $userID = $stmt->insert_id;
-                } else {
+                }
+                else
+                {
                     //User already exists — update
                     $stmt->close();
 
@@ -89,7 +106,8 @@ if($_SERVER["REQUEST_METHOD"] == 'POST')
                 $stmt->execute();
                 $stmt->bind_result($storyID);
 
-                if (!$stmt->fetch()) {
+                if (!$stmt->fetch())
+                {
                     //Story doesn't exist, insert it
                     $stmt->close();
                     $stmt = $mysqli->prepare("INSERT INTO Story (Title, Body, PublishedTimestamp, ComicURL)
@@ -97,7 +115,9 @@ if($_SERVER["REQUEST_METHOD"] == 'POST')
                     $stmt->bind_param("ssss", $storyTitle, $storyBody, $publishedTimestamp, $comicUrl);
                     $stmt->execute();
                     $storyID = $stmt->insert_id;
-                } else {
+                }
+                else
+                {
                     //Story already exists — update
                     $stmt->close();
 
@@ -115,14 +135,17 @@ if($_SERVER["REQUEST_METHOD"] == 'POST')
                 $stmt->execute();
                 $stmt->store_result();
 
-                if ($stmt->num_rows === 0) {
+                if ($stmt->num_rows === 0)
+                {
                     //Comment doesn't exist, insert it
                     $stmt->close();
                     $stmt = $mysqli->prepare("INSERT INTO Comment (UserID, StoryID, Timestamp, CommentText)
                               VALUES (?, ?, ?, ?)");
                     $stmt->bind_param("iiss", $userID, $storyID, $commentTimestamp, $commentText);
                     $stmt->execute();
-                } else {
+                }
+                else
+                {
                     //Comment already exists — update
                     $stmt->close();
 
@@ -150,34 +173,49 @@ if($_SERVER["REQUEST_METHOD"] == 'POST')
 
     <!--form html-->
     <br><br>
+<div class="container">
     <form method = "post" enctype = "multipart/form-data">
         <div class = "input-group mb-3">
-            File: <input type = "file" name = "importFile" />
-            <br><br>
-            <input type ="submit" value ="Upload Data" />
+            <input class="form-control" type = "file" name = "importFile" />
+            <input class="btn btn-light" type ="submit" value ="Upload Data" />
         </div>
     </form>
 
 <?php
 //success and fail messages
-if($import_attempted){
-    if($import_successful){
+if($import_attempted)
+{
+    if($import_successful)
+    {
         ?>
-        <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
-            <strong>Success!</strong>
+        <div class="alert alert-success alert-dismissible fade show mt-3 w-auto d-inline-block" role="alert">
+            <strong>Success!</strong> Data has successfully been imported.
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
+
+        <br>
+        <div class="d-grid gap-2" >
+            <a type="button" class="btn btn-lg btn-primary" href="./Report1.php">View Report 1</a>
+        </div>
+
         <?php
     }
     else
     {
         ?>
-        <h1><span class="text-danger"> Import Failed</span></h1>
-        <?php
-        echo $import_error_message; ?>
+        <div class="alert alert-danger alert-dismissible fade show mt-3 w-auto d-inline-block" role="alert">
+            <strong>Import Failed:</strong>
+            <?php echo htmlspecialchars($import_error_message); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <br>
         <?php
     }
 }
+
 ?>
+
+</div>
+    <br><br>
 
 <?php include_once("footer.php"); ?>

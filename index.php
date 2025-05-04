@@ -21,7 +21,7 @@ include 'header.php';
                 that deletes all user data in production. <strong>Don't try this at home. </strong> </small></p>
 
         <!-- Reset Button -->
-        <button id="resetButton" class="btn btn-lg btn-secondary" data-bs-toggle="modal" data-bs-target="#resetModal">
+        <button id="resetButton" class="btn btn-outline-danger btn-lg" data-bs-toggle="modal" data-bs-target="#resetModal">
             Reset Database
         </button>
 
@@ -64,23 +64,38 @@ include 'header.php';
                         },
                         body: 'reset=1'
                     })
-                        .then(response => response.text())
-                        .then(data => {
-                            // Show success message
-                            resultContainer.innerHTML = `
-                                <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
-                                    <strong>Success!</strong> ${data}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                    </div>`;
+                        .then(async response => {
+                            const text = await response.text();
 
-                            // Focus back to main container
+                            // Check if HTTP response is not OK (status 200–299)
+                            if (!response.ok) {
+                                throw new Error(text || 'Server returned an error.');
+                            }
+
+                            // Check if text contains error-like content
+                            if (text.toLowerCase().includes('error')) {
+                                throw new Error(text);
+                            }
+
+                            // Otherwise, show success
+                            resultContainer.innerHTML = `
+                            <div class="alert alert-success alert-dismissible fade show mt-3 w-auto d-inline-block" role="alert">
+                                <strong>Success!</strong> ${text}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>`;
+
                             container?.focus();
                         })
                         .catch(error => {
-                            resultContainer.innerHTML = `<div class="alert alert-danger mt-3">Error: ${error}</div>`;
+                            resultContainer.innerHTML = `
+                            <div class="alert alert-failure alert-dismissible fade show mt-3 w-auto d-inline-block" role="alert">
+                                <strong>Failure!</strong> ${error.message}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>`;
                         });
                 });
             });
+
         </script>
     </div>
 
