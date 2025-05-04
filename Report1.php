@@ -151,6 +151,7 @@ function output_story_row($id, $title, $body_tex, $published_timestamp, $comic_u
 
 function output_comment_row($id, $user, $story, $comment_text, $time_stamp)
 {
+    echo "<p> entered </p>";
     echo "<tr class>\n";
     echo "<td>$user</td>";
     echo "<td>$comment_text</td>";
@@ -208,37 +209,47 @@ else
         {
             // Output the data from this current row
             // ID is there to prevent data shifting errors
-            output_story_row($row[" id"], $row[" title"], $row[" body text"], $row[" published_timestamp"],
-                $row[" comic_url"]);
-
+            output_story_row($row[0], $row[1], $row[2], $row[3],
+                $row[4]);
+            $saved_id = $row[0];
             // Run a subquery and find all comments on this story
-            $subquery = 'SELECT * FROM comment WHERE story_id = $row[" story_id"]';;
-            $commentResult = mysqli_query($conn, $subquery);
+            $subquery = $conn->prepare('SELECT * FROM comment WHERE StoryID = ?');
+            $subquery->bind_param("i", $saved_id);
+            $subquery->execute();
+            $commentResult = $subquery->get_result();
 
             // If there are results
-            if($commentResult)
+            if(mysqli_num_rows($commentResult) > 0)
             {
+                $commentResult = $subquery->get_result();
+
                 // Open the comment table
                 comment_table_open();
 
-                // While there are results from $subquery
-                while($row = $commentResult ->fetch_array())
+                foreach($commentResult as $comment)
                 {
+
+                    echo "<p> enter </p>";
+
+
+
+                // While there are results from $subquery
                     // Output the data from this current row. The IDs are there to prevent data shifting errors
 
-                    $user = 'SELECT * FROM user WHERE user_id = $row[" user_id"]';
-                    output_comment_row($row [" id"], 'SELECT display name FROM $user',
-                        $row[" story id"], $row[ "comment text"], $row[ "published timestamp"]);
+
+                    output_comment_row($comment [0], $comment[2],
+                        $comment[2], $comment[3], $comment[4]);
+
+                    $user_query = $conn->prepare('SELECT * FROM user WHERE UserID = ?');
+                    $user_query->bind_param("i", $row[1]);
+                    $user_query->execute();
+                    $user = $user_query->get_result();
 
                     user_table_open();
 
                     // Using individual select statements here as there should be one user per comment
                     output_user_row(
-                            'SELECT DisplayName FROM $user',
-                            'SELECT Role FROM $user',
-                            'SELECT SubscriptionStatus FROM $user',
-                            'SELECT Email FROM $user',
-                            'SELECT DateJoined FROM $user'
+                            $user[2], $user[6],$user[2],$user[3], $user[5]
                     );
 
                     // Close the user tab;e
@@ -246,8 +257,14 @@ else
 
                 }
 
+                echo "<p> No results left </p>";
+
                 //Close the comment table
                 comment_table_close();
+            }
+            else
+            {
+                echo "<p> No comments on this article </p>";
             }
 
         }
