@@ -1,70 +1,69 @@
 <?php include 'header.php'; ?>
 
 <div class="container">
-    <h1>Event Listings</h1>
-    <p>This page displays all events with their associated tag and location information.</p>
+    <h1>Event Report</h1>
+    <p>This report displays each event in its own table, with associated location and tag info shown in subtables.</p>
 </div>
 
 <?php
-$conn = mysqli_connect("localhost", "root", "sqlpassword_1", "news");
+$conn = mysqli_connect("localhost", "root", "sqlpassword_1", "news", 3300);
 
 if (!$conn) {
     die("<div class='alert alert-danger'>Connection Error: " . mysqli_connect_error() . "</div>");
 }
 
-// --- Functions to render HTML tables ---
-function output_event_table_open() {
-    echo "<table class='table table-striped' style='width: 100%'>\n";
-    echo "<thead><tr>
-        <th>Event Name</th>
-        <th>Description</th>
-        <th>Sponsor</th>
-        <th>Start</th>
-        <th>End</th>
-        <th>Tag</th>
-        <th>Location</th>
-    </tr></thead>\n";
-}
-
-function output_event_row($event) {
-    echo "<tr>
-        <td>{$event['EventName']}</td>
-        <td>{$event['Description']}</td>
-        <td>{$event['Sponsor']}</td>
-        <td>{$event['EventStart']}</td>
-        <td>{$event['EventEnd']}</td>
-        <td>{$event['TagDisplayName']}</td>
-        <td>{$event['LocationName']}<br><small>{$event['LocationAddress']}</small></td>
-    </tr>\n";
-}
-
-function output_event_table_close() {
-    echo "</table>\n";
-}
-
-// --- Query to get all events with JOINs for Tag and Location ---
 $query = "
     SELECT 
-        e.EventID, e.Sponsor, e.TagID, e.LocationID, e.EventStart, e.EventEnd, e.Description, e.EventName,
-        t.DisplayName AS TagDisplayName, t.DateAdded AS TagDateAdded,
-        l.LocationName, l.LocationAddress, l.DateAdded AS LocationDateAdded
+        e.EventID, e.EventName, e.Description, e.Sponsor, e.EventStart, e.EventEnd,
+        t.DisplayName AS TagName, t.DateAdded AS TagDate,
+        l.LocationName, l.LocationAddress, l.DateAdded AS LocationDate
     FROM Event e
     LEFT JOIN Tag t ON e.TagID = t.TagID
     LEFT JOIN Location l ON e.LocationID = l.LocationID
+    ORDER BY e.EventStart DESC
 ";
 
 $result = mysqli_query($conn, $query);
 
-if (!$result) {
-    echo "<div class='alert alert-danger'>Database Query Failed: " . mysqli_error($conn) . "</div>";
-} else {
-    output_event_table_open();
+if ($result && mysqli_num_rows($result) > 0) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        echo "<div class='mb-4'>";
 
-    while ($event = mysqli_fetch_assoc($result)) {
-        output_event_row($event);
+        // Main event table
+        echo "<table class='table table-bordered'>\n";
+        echo "<thead class='table-primary'>
+                <tr><th colspan='2'>Event: {$row['EventName']}</th></tr>
+              </thead>\n";
+        echo "<tbody>
+                <tr><th style='width: 20%'>Sponsor</th><td>{$row['Sponsor']}</td></tr>
+                <tr><th>Description</th><td>{$row['Description']}</td></tr>
+                <tr><th>Start</th><td>{$row['EventStart']}</td></tr>
+                <tr><th>End</th><td>{$row['EventEnd']}</td></tr>
+              </tbody>
+              </table>";
+
+        // Tag subtable
+        echo "<h6>Tag Info</h6>";
+        echo "<table class='table table-sm table-striped table-bordered w-50 mb-3'>
+                <thead><tr><th>Tag Name</th><th>Date Added</th></tr></thead>
+                <tbody><tr><td>{$row['TagName']}</td><td>{$row['TagDate']}</td></tr></tbody>
+              </table>";
+
+        // Location subtable
+        echo "<h6>Location Info</h6>";
+        echo "<table class='table table-sm table-striped table-bordered w-75'>
+                <thead><tr><th>Location Name</th><th>Address</th><th>Date Added</th></tr></thead>
+                <tbody><tr>
+                    <td>{$row['LocationName']}</td>
+                    <td>{$row['LocationAddress']}</td>
+                    <td>{$row['LocationDate']}</td>
+                </tr></tbody>
+              </table>";
+
+        echo "</div>";
     }
-
-    output_event_table_close();
+} else {
+    echo "<div class='alert alert-warning'>No events found.</div>";
 }
 ?>
 
