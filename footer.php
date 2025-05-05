@@ -1,8 +1,10 @@
 <?php
 // footer.php
 ?>
-<footer class="bg-light text-center py-3">
-    <p>&copy; 2025 My Website. All Rights Reserved.</p>
+
+<br><br><br>
+<footer class="bg-secondary-subtle text-center py-3 fixed-bottom">
+    <p>&copy; 2025 Dumpster-Fire-Deluxe All Rights Reserved.</p>
 </footer>
 
 <!-- Bootstrap JS and Popper.js (needed for dropdowns) -->

@@ -77,7 +77,8 @@ $createTables = [
       `AdType` ENUM('banner', 'video', 'image') NOT NULL,
       `ContentURL` VARCHAR(150) NOT NULL,
       `AdName` VARCHAR(30) NOT NULL,
-      PRIMARY KEY (`AdID`))
+      PRIMARY KEY (`AdID`),
+      UNIQUE INDEX `AdName_UNIQUE` (`AdName` ASC) VISIBLE)
     ENGINE = InnoDB;",
 
     "CREATE TABLE IF NOT EXISTS `news`.`Comment` (

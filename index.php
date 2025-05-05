@@ -2,18 +2,22 @@
 include 'header.php';
 ?>
 
-    <!DOCTYPE html><br>
+<!DOCTYPE html>
 
+<div class="bg-secondary-subtle p-4">
     <div class="container">
-        <h1 id="body">Welcome to My Website</h1>
-        <br>
-        <p>Here you can import data and view their reports. This is the home page. </p>
-        <p><strong> We love everything news!</strong></p>
+        <br><br>
+        <h1 id="body" class="text-center">Welcome to DFD's RDBMS Project!</h1>
+        <h4 class="text-center"><em>"Breaking News: We’re Still on Fire."</em></h4>
+        <br><br>
     </div>
+</div>
 
 <br><br>
 
     <div id="cont" class="container">
+        <p>Here you can import data and view their reports. This is the home page. Follow the steps below to perform
+            the <abbr title="Extract, Transform, and Load">ETL</abbr> process.</p> <br><br>
         <h3>1. Reset Database for Import Process</h3>
         <p>First, reset the database by pressing the button below. This will drop and re-create all the tables in the
             schema for a fresh experience. </p>
@@ -107,9 +111,9 @@ include 'header.php';
             to navigate to the import pages</p>
         <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
             <div class="btn-group me-2" role="group" aria-label="First group">
-                <a type="button" class="btn btn-secondary" href="./Import1.php">Import Page 1</a>
-                <a type="button" class="btn btn-secondary" href="./Import2.php">Import Page 2</a>
-                <a type="button" class="btn btn-secondary" href="./Import3.php">Import Page 3</a>
+                <a type="button" class="btn btn-primary" href="./Import1.php">Import Page 1</a>
+                <a type="button" class="btn btn-primary" href="./Import2.php">Import Page 2</a>
+                <a type="button" class="btn btn-primary" href="./Import3.php">Import Page 3</a>
             </div>
         </div>
     </div>
@@ -122,9 +126,9 @@ include 'header.php';
             to navigate to the report pages</p>
         <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
             <div class="btn-group me-2" role="group" aria-label="First group">
-                <a type="button" class="btn btn-secondary" href="./Report1.php">Report Page 1</a>
-                <a type="button" class="btn btn-secondary" href="./Report2.php">Report Page 2</a>
-                <a type="button" class="btn btn-secondary" href="./Report3.php">Report Page 3</a>
+                <a type="button" class="btn btn-info" href="./Report1.php">Report Page 1</a>
+                <a type="button" class="btn btn-info" href="./Report2.php">Report Page 2</a>
+                <a type="button" class="btn btn-info" href="./Report3.php">Report Page 3</a>
             </div>
         </div>
     </div>

@@ -3,16 +3,18 @@ include 'header.php';
 ?>
 
 <!DOCTYPE html>
+
 <!--header-->
 <div class="bg-primary-subtle p-4"> <br>
     <div class="container hei">
-    <h1>Import Process 1: <small class="text-body-secondary">User, Story, Comment</small> </h1>
-    <br>
-    <p>This is the import 1 page. Here you can import user, story, and comment data.</p>
-    <br>
-    <br>
-    <br>
-    <br>
+        <h1>Import Process 1: <small class="text-body-secondary">User, Story, Comment</small> </h1>
+        <br>
+        <p>This is the import 1 page. Here you can import user, story, and comment data. This import process reads a CSV
+            file line by line, extracting unnormalized data from our news schema. It checks each record for existing entries
+            in the database, inserting new ones or updating existing ones as needed, while maintaining relationships between
+            tables through foreign keys. The process also ensures linking tables are correctly populated to reflect their
+            associations, visible in the reports generated after each import.</p>
+        <br>
     </div>
 
     <?php
@@ -177,7 +179,7 @@ if($_SERVER["REQUEST_METHOD"] == 'POST')
     <form method = "post" enctype = "multipart/form-data">
         <div class = "input-group mb-3">
             <input class="form-control" type = "file" name = "importFile" />
-            <input class="btn btn-light" type ="submit" value ="Upload Data" />
+            <input class="btn btn-light fs-6" type ="submit" value ="Upload Data" />
         </div>
     </form>
 
@@ -195,7 +197,7 @@ if($import_attempted)
 
         <br>
         <div class="d-grid gap-2" >
-            <a type="button" class="btn btn-lg btn-primary" href="./Report1.php">View Report 1</a>
+            <a type="button" class="btn btn-lg btn-primary fs-4" href="./Report1.php">View Report 1</a>
         </div>
 
         <?php
@@ -216,6 +218,11 @@ if($import_attempted)
 ?>
 
 </div>
-    <br><br>
+
+<br><br>
+<div class="container d-grid gap-2" >
+    <a type="button" class="btn btn-lg btn-light" href="./index.php">Return Home</a>
+</div>
+<br><br>
 
 <?php include_once("footer.php"); ?>

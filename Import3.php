@@ -9,10 +9,11 @@ include 'header.php';
     <div class="container hei">
         <h1>Import Process 3: <small class="text-body-secondary">Location, Tag, Event</small> </h1>
         <br>
-        <p>This is the import 3 page. Here you can import location, tag, and event data.</p>
-        <br>
-        <br>
-        <br>
+        <p>This is the import 3 page. Here you can import location, tag, and event data. This import process reads a CSV
+            file line by line, extracting unnormalized data from our news schema. It checks each record for existing
+            entries in the database, inserting new ones or updating existing ones as needed, while maintaining
+            relationships between tables through foreign keys. The process also ensures linking tables are correctly
+            populated to reflect their associations, visible in the reports generated after each import.</p>
         <br>
     </div>
 
@@ -200,7 +201,7 @@ if($_SERVER["REQUEST_METHOD"] == 'POST')
         <form method = "post" enctype = "multipart/form-data">
             <div class = "input-group mb-3">
                 <input class="form-control" type = "file" name = "importFile" />
-                <input class="btn btn-light" type ="submit" value ="Upload Data" />
+                <input class="btn btn-light fs-6" type ="submit" value ="Upload Data" />
             </div>
         </form>
 
@@ -238,6 +239,11 @@ if($_SERVER["REQUEST_METHOD"] == 'POST')
 
         ?>
 
+    </div>
+
+    <br><br>
+    <div class="container d-grid gap-2" >
+        <a type="button" class="btn btn-lg btn-light" href="./index.php">Return Home</a>
     </div>
     <br><br>
 
