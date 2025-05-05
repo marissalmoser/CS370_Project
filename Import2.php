@@ -262,7 +262,7 @@ if($_SERVER["REQUEST_METHOD"] == 'POST')
 
                 <br>
                 <div class="d-grid gap-2" >
-                    <a type="button" class="btn btn-lg btn-primary" href="./Report1.php">View Report 2</a>
+                    <a type="button" class="btn btn-lg btn-primary" href="./Report2.php">View Report 2</a>
                 </div>
 
                 <?php
