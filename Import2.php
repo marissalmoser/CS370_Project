@@ -34,7 +34,7 @@ if($_SERVER["REQUEST_METHOD"] == 'POST')
 {
     $import_attempted = true;
 
-    $mysqli = new mysqli("localhost", "root", "rootpass", "news");
+    $mysqli = new mysqli("localhost", "root", "root3", "news");
 
     if ($mysqli->connect_errno)
     {

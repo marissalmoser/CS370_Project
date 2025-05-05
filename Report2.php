@@ -4,7 +4,7 @@
     <h1 class="mb-4">Stories and Their Details</h1>
 
     <?php
-    $conn = mysqli_connect("localhost", "root", "rootpass", "news");
+    $conn = mysqli_connect("localhost", "root", "root3", "news");
     if (!$conn) {
         die("<div class='alert alert-danger'>Connection Error: " . mysqli_connect_error() . "</div>");
     }
