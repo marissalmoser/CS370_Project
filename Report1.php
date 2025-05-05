@@ -82,7 +82,7 @@ function story_table($row)
     echo "<div class = 'mb-4'>";
 
    echo "<table id = 'output' class = 'table table-bordered' style = 'width: 100%'>\n";
-    echo "<thead class='table-primary'>
+    echo "<thead class='table-info'>
                 <tr><th colspan='2'>Story Title: {$row[1]}</th></tr>
               </thead>\n";
     echo "<tbody>
@@ -101,16 +101,18 @@ function story_table($row)
 
 }
 
-function comment_table($row, $user)
+function comment_table($row, $displayName)
 {
+
+
     echo "<p></p>";
     echo "
-                <tbody>
-                    <tr>
-                        <td>{$user['DisplayName']}</td>
-                        <td>{$row['CommentText']}</td>
-                        <td>{$row['Timestamp']}</td>
-                    </tr>";
+    <tbody>
+        <tr>
+            <td>$displayName</td>
+            <td>{$row['CommentText']}</td>
+            <td>{$row['Timestamp']}</td>
+        </tr>";
     /*echo "<tr class>\n";
     echo "<td>";
     echo "<table id = 'output' class = 'table table-striped' style = 'width: 100%'>\n";
@@ -263,7 +265,7 @@ else
             $subquery->bind_param("i", $saved_id);
             $subquery->execute();
             $commentResult = $subquery->get_result();
-
+            echo mysqli_num_rows($commentResult);
             // If there are results
             if(mysqli_num_rows($commentResult) > 0)
             {
@@ -273,35 +275,42 @@ else
                 {
                 // While there are results from $subquery
                     //Output the data from this current row. The IDs are there to prevent data shifting errors
+                    $userID = $comment['UserID'];
+                    $subquery = $conn->prepare('SELECT DisplayName FROM user WHERE UserID = ?');
+                    $subquery->bind_param("i", $userID);
+                    $subquery->execute();
+                    $result = $subquery->get_result();
+                    $displayNameRow = $result->fetch_assoc();
+                    $displayName = $displayNameRow['DisplayName'];
 
-
-
-                    $user_query = $conn->prepare('SELECT * FROM user WHERE UserID = ?');
-                    $user_query->bind_param("i", $comment['UserID']);
-                    $user_query->execute();
-                    $user = $user_query->get_result();
-
-                    if(mysqli_num_rows($user) > 0)
-                    {
-
-                        foreach($user as $userRow)
-                        {
-                            comment_table($comment, $userRow);
-
-                            user_table($userRow);
-                        }
-
-                    }
-                    else
-                    {
-                        echo '<p>Cannot find users for comments with userID </p>';
-
-                    }
-
-
+                    comment_table($comment, $displayName);
                 }
 
                 comment_table_close();
+
+
+
+                $user_query = $conn->prepare('SELECT * FROM user WHERE UserID = ?');
+                $user_query->bind_param("i", $comment['UserID']);
+                $user_query->execute();
+                $user = $user_query->get_result();
+
+                if(mysqli_num_rows($user) > 0)
+                {
+
+                    foreach($user as $userRow)
+                    {
+
+
+                        user_table($userRow);
+                    }
+
+                }
+                else
+                {
+                    echo '<p>Cannot find users for comments with userID </p>';
+
+                }
 
 
             }
