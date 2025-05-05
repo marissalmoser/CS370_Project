@@ -3,10 +3,18 @@ include 'header.php';
 ?>
 
     <!DOCTYPE html>
+    <div class="bg-info-subtle p-4"> <br>
+        <div class="container hei">
+            <h1>Report 1: <small class="text-body-secondary">User, Story, Comment</small> </h1>
+            <br>
+            <p>This is the report 1 page. Here you can see user, story, and comment data. It shows all stories and
+                whatever comments they have.</p>
+            <br>
+        </div>
 
-    <div class="container">
-        <h1>Story Comments</h1>
-        <p>This page reports on all comments on this site. It shows all stories and whatever comments they have.</p>
+        <?php
+        include 'ReportsHeader.php';
+        ?>
     </div>
 
 <?php
@@ -14,7 +22,7 @@ include 'header.php';
 $connection_error = false;
 $connection_error_message = "";
 
-$conn = mysqli_connect('localhost', 'root', 'SQLP@ss', 'news');
+$conn = mysqli_connect('localhost', 'root', 'root3', 'news');
 
 if(!$conn)
 {
@@ -35,7 +43,7 @@ function story_table($row)
     echo "<div class = 'mb-4'>";
 
    echo "<table id = 'output' class = 'table table-bordered' style = 'width: 100%'>\n";
-    echo "<thead class='table-primary'>
+    echo "<thead class='table-info'>
                 <tr><th colspan='2'>Story Title: {$row[1]}</th></tr>
               </thead>\n";
     echo "<tbody>
