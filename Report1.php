@@ -3,10 +3,18 @@ include 'header.php';
 ?>
 
     <!DOCTYPE html>
+    <div class="bg-info-subtle p-4"> <br>
+        <div class="container hei">
+            <h1>Report 1: <small class="text-body-secondary">User, Story, Comment</small> </h1>
+            <br>
+            <p>This is the report 1 page. Here you can see user, story, and comment data. It shows all stories and
+                whatever comments they have.</p>
+            <br>
+        </div>
 
-    <div class="container">
-        <h1>Story Comments</h1>
-        <p>This page reports on all comments on this site. It shows all stories and whatever comments they have.</p>
+        <?php
+        include 'ReportsHeader.php';
+        ?>
     </div>
 
 <!--example table-->

@@ -1,8 +1,17 @@
 <?php include 'header.php'; ?>
 
-<div class="container">
-    <h1>Stories and Advertisements</h1>
-    <p>This page displays all stories and active advertisements on the site.</p>
+<div class="bg-info-subtle p-4"> <br>
+    <div class="container hei">
+        <h1>Report 2: <small class="text-body-secondary">Story, Author, Tag, and Advertisement</small> </h1>
+        <br>
+        <p>This is the report 2 page. Here you can see story, author, tag, and advertisement data. It shows all stories and
+            whatever other data they have.</p>
+        <br>
+    </div>
+
+    <?php
+    include 'ReportsHeader.php';
+    ?>
 </div>
 
 <?php

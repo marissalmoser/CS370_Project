@@ -1,8 +1,17 @@
 <?php include 'header.php'; ?>
 
-<div class="container">
-    <h1>Event Report</h1>
-    <p>This report displays each event in its own table, with associated location and tag info shown in subtables.</p>
+<div class="bg-info-subtle p-4"> <br>
+    <div class="container hei">
+        <h1>Report 3: <small class="text-body-secondary">Location, Tag, Event</small> </h1>
+        <br>
+        <p>This is the report 3 page. This report displays each event in its own table, with associated location and
+            tag info shown in sub-tables.</p>
+        <br>
+    </div>
+
+    <?php
+    include 'ReportsHeader.php';
+    ?>
 </div>
 
 <?php
