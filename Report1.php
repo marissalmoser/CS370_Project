@@ -161,7 +161,6 @@ else
             // If there are results
             if(mysqli_num_rows($unique_users_result) > 0) {
 
-                open_user_table();
 
 
                 foreach ($unique_users_result as $user) {
@@ -179,6 +178,8 @@ else
 
                     while ($user1 = $user_results->fetch_assoc())
                     {
+                        open_user_table();
+
                         display_user_rows($user1, $user_comments);
                         close_user_table();
 
