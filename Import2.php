@@ -83,7 +83,7 @@ if($_SERVER["REQUEST_METHOD"] == 'POST')
                     $stmt->close();
                     $stmt = $mysqli->prepare("INSERT INTO story (Title, Body, PublishedTimestamp, ComicURL)
                                   VALUES (?, ?, ?, ?)");
-                    $stmt->bind_param("ssss", $storyTitle, $storyBody, $publishedTimestamp, $comicUrl);
+                    $stmt->bind_param("ssss", $storyTitle, $storyBody, $publishedTimestamp, $comicURL);
                     $stmt->execute();
                     $storyID = $stmt->insert_id;
                 } else {
@@ -94,7 +94,7 @@ if($_SERVER["REQUEST_METHOD"] == 'POST')
                     $stmt = $mysqli->prepare("UPDATE story
                               SET Body = ?, PublishedTimestamp = ?, ComicURL = ?
                               WHERE StoryID = ?");
-                    $stmt->bind_param("ssss", $storyBody, $publishedTimestamp, $comicUrl, $storyID);
+                    $stmt->bind_param("ssss", $storyBody, $publishedTimestamp, $comicURL, $storyID);
                     $stmt->execute();
                 }
 
