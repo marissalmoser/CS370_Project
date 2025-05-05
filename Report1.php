@@ -42,9 +42,8 @@ function story_table($row)
                 <tr><th style='width: 20%'>Body Text</th><td>{$row[2]}</td></tr>
                 <tr><th>Published Timestamp</th><td>{$row[3]}</td></tr>
                 <tr><th>Comic URL</th><td>{$row[4]}</td></tr>
-              </tbody>";
-
-
+              ";
+    echo "</tbody></table>";
 }
 
 function display_user_rows($row, $userComments)
@@ -56,7 +55,12 @@ function display_user_rows($row, $userComments)
                     <td>{$row['Email']}</td>
                     <td>{$row['DateJoined']}</td>
                 </tr>";
-    echo "<h6>Comments on this Story</h6>";
+
+}
+
+function open_comment_table()
+{
+    echo "<h6>Comments</h6>";
     echo "<table  id = 'comment' class='table table-sm table-striped table-bordered w-50 mb-3'>
                 <thead>
                     <tr>
@@ -66,22 +70,14 @@ function display_user_rows($row, $userComments)
                     </tr>
                 </thead>
        <tbody>";
-
-
-
-
 }
-
-
 function display_comment_rows($user, $row)
 {
-    echo "
-                
-                    <tr>
-                        <td>{$user['DisplayName']}</td>
-                        <td>{$row['CommentText']}</td>
-                        <td>{$row['Timestamp']}</td>
-                    </tr>";
+    echo "<tr>
+            <td>{$user['DisplayName']}</td>
+            <td>{$row['CommentText']}</td>
+            <td>{$row['Timestamp']}</td>
+          </tr>";
 }
 
 function open_user_table()
@@ -99,15 +95,14 @@ function open_user_table()
                 </thead>
                 <tbody>";
 }
-
-function output_table_close()
+function close_comment_table()
 {
-    echo "</div>";
+
+    echo "</tbody></table id = 'comment'>";
 }
 function close_user_table()
 {
-    echo "</tr></table id = 'comment'>";
-    echo "</tr></table id = 'user'>";
+    echo "</tbody></table id = 'user'>";
 }
 
 //If there's a connection error, display it
@@ -154,6 +149,7 @@ else
             $unique_users->execute();
             $unique_users_result = $unique_users->get_result();
 
+
             // If there are results
             if(mysqli_num_rows($unique_users_result) > 0) {
 
@@ -176,28 +172,27 @@ else
                     while ($user1 = $user_results->fetch_assoc())
                     {
                         display_user_rows($user1, $user_comments);
+                        close_user_table();
 
+
+                        open_comment_table();
                         while($comment1 = $user_comments_result->fetch_assoc())
                         {
                             display_comment_rows($user1, $comment1);
                         }
 
+
+                        close_comment_table();
+
+
                     }
 
-                    close_user_table();
-
                 }
-            }
-            else
-            {
-                echo "<p> No users found!</p>";
-            }
 
+            }
 
         }
 
-        // Close the output table
-        output_table_close();
     }
 }
 
