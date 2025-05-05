@@ -42,21 +42,6 @@ include 'header.php';
     </table>-->
 
 <?php
-//I keep encountering issues with connecting to mysql. I have reinstalled a few times and made sure things are properly linked up
-//I'm overlooking something; the below commented lines are test lines
-/*output_table_open();
-output_story_row("0", "Test Title", "Test Body", "2020-01-23");
-comment_table_open();
-output_comment_row("0", "Test Comment", "1", "test comment", "2918-128-12");
-user_table_open();
-output_user_row("Test user", "Admin", "active", "fake@gmail.com", "2918-128-12");
-user_table_close();
-output_comment_row("0", "Test user2", "1", "test comment2", "2918-128-12");
-user_table_open();
-output_user_row("Test user1", "Admin1", "active1", "fake1@gmail.com", "2918-128-12");
-user_table_close();
-comment_table_close();
-output_story_row("1", "Test Title1", "Test Body1", "2020-01-01");*/
 
 $connection_error = false;
 $connection_error_message = "";
@@ -122,6 +107,44 @@ function comment_table($row, $user)
             echo "</tr>\n";
         echo "</thead>\n";*/
 }
+function display_user_rows($row, $userComments)
+{
+    echo "<tr>
+                    <td>{$row['DisplayName']}</td>
+                    <td>{$row['Role']}</td>
+                    <td>{$row['SubscriptionStatus']}</td>
+                    <td>{$row['Email']}</td>
+                    <td>{$row['DateJoined']}</td>
+                </tr>";
+    echo "<h6>Comments on this Story</h6>";
+    echo "<table  id = 'comment' class='table table-sm table-striped table-bordered w-50 mb-3'>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Comment Text</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>";
+
+
+
+}
+
+function open_user_table()
+{
+    echo "<tr> 
+    <h6>Users who Commented on this Story</h6>
+    <table  id = 'user' class='table table-sm table-striped table-bordered w-75'>
+                <thead>
+                    <tr>
+                        <th>Display Name</th>
+                        <th>Role</th>
+                        <th>Subscription Status</th>
+                        <th>Email</th>
+                        <th>Date Joined</th>
+                    </tr>
+                </thead>";
+}
 
 function user_table($row)
 {
@@ -145,18 +168,6 @@ function user_table($row)
                     <td>{$row['DateJoined']}</td>
                 </tr>
               </table id = 'user'></tr>";
-    /*echo "<tr class>\n";
-    echo "<td>";
-    echo "<table id = 'output' class = 'table table-striped' style = 'width: 100%'>\n";
-    echo "<thead>\n";
-    echo "<tr>\n";
-    echo "<th>Display Name</th>\n";
-    echo "<th>Role</th>\n";
-    echo "<th>Subscription Status</th>\n";
-    echo "<th>Email</th>\n";
-    echo "<th>Date Joined</th>\n";
-    echo "</tr>\n";
-    echo "</thead>\n";*/
 }
 
 function comment_table_open()
@@ -181,42 +192,7 @@ function comment_table_close()
     echo "</tbody>\n";
     echo "</table>\n";
 }
-/*
-function user_table_close()
-{
-    echo "</td>\n";
-    echo "</table>\n";
-}
-function output_story_row($id, $title, $body_tex, $published_timestamp, $comic_url = 'N/A')
-{
-    echo "<tr class>\n";
-    echo "<td> $title </td>";
-    echo "<td> $body_tex </td>";
-    echo "<td> $published_timestamp </td>";
-    echo "<td> $comic_url </td>";
-    echo "</tr>\n";
-}
 
-function output_comment_row($id, $user, $story, $comment_text, $time_stamp)
-{
-    echo "<p> entered </p>";
-    echo "<tr class>\n";
-    echo "<td>$user</td>";
-    echo "<td>$comment_text</td>";
-    echo "<td>$time_stamp</td>";
-    echo "</tr>\n";
-}
-
-function output_user_row($display_name, $role, $subscription_status, $email, $date_joined)
-{
-    echo "<tr class>\n";
-    echo "<td>$display_name</td>";
-    echo "<td>$role</td>";
-    echo "<td>$subscription_status</td>";
-    echo "<td>$email</td>";
-    echo "<td>$date_joined</td>";
-    echo "</tr>\n";
-}*/
 
 // Here is where stuff may need to be changed
 
@@ -256,20 +232,43 @@ else
             story_table($row);
 
             // Get the StoryID and save it
-            $saved_id = $row[0];
+            $story_id = $row[0];
 
-            // Run a subquery and find all comments on this story
-            $subquery = $conn->prepare('SELECT * FROM comment WHERE StoryID = ?');
-            $subquery->bind_param("i", $saved_id);
-            $subquery->execute();
-            $commentResult = $subquery->get_result();
+
+
+
+            // Run a subquery and find all unique users who commented on this story
+            $unique_users = $conn->prepare('SELECT DISTINCT UserID FROM comment WHERE StoryID = ?');
+            $unique_users->bind_param("i", $story_id);
+            $unique_users->execute();
+            $unique_users_result = $unique_users->get_result();
 
             // If there are results
-            if(mysqli_num_rows($commentResult) > 0)
+            if(mysqli_num_rows($unique_users_result) > 0)
             {
+                echo "<p> Found at least one user</p>";
+
+                open_user_table();
+
+                $users = $conn->prepare('SELECT * FROM user WHERE UserID = ?');
+                $users->bind_param("i", $user_id);
+                $users->execute();
+                $user_results = $users->get_result();
+
+                $user_comments = $conn->prepare('SELECT * FROM comment INNER JOIN user WHERE comment.UserID = user.userID AND comment.StoryID = ?');
+                $user_comments->bind_param("i", $story_id);
+                $user_comments->execute();
+                $user_comments_result = $user_comments->get_result();
+
+                foreach($user_results as $curr_user)
+                {
+                    display_user_rows($curr_user, $user_comments);
+                }
+                /*
                 comment_table_open();
 
-                foreach($commentResult as $comment)
+
+                foreach($unique_users_result as $comment)
                 {
                 // While there are results from $subquery
                     //Output the data from this current row. The IDs are there to prevent data shifting errors
@@ -301,7 +300,7 @@ else
 
                 }
 
-                comment_table_close();
+                comment_table_close();*/
 
 
             }
