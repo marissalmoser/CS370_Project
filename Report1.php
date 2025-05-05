@@ -9,38 +9,6 @@ include 'header.php';
         <p>This page reports on all comments on this site. It shows all stories and whatever comments they have.</p>
     </div>
 
-<!--example table-->
-   <!-- <table class="table table-striped">
-        <thead>
-        <tr>
-            <th scope="col">Title</th>
-            <th scope="col">Body Text</th>
-            <th scope="col">Published Timestamp</th>
-            <th scope="col">Comic URL</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <th scope="row">1</th>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>@mdo</td>
-        </tr>
-        <tr>
-            <th scope="row">2</th>
-            <td>Jacob</td>
-            <td>Thornton</td>
-            <td>@fat</td>
-        </tr>
-        <tr>
-            <th scope="row">3</th>
-            <td>John</td>
-            <td>Doe</td>
-            <td>@social</td>
-        </tr>
-        </tbody>
-    </table>-->
-
 <?php
 
 $connection_error = false;
@@ -74,39 +42,11 @@ function story_table($row)
                 <tr><th style='width: 20%'>Body Text</th><td>{$row[2]}</td></tr>
                 <tr><th>Published Timestamp</th><td>{$row[3]}</td></tr>
                 <tr><th>Comic URL</th><td>{$row[4]}</td></tr>
-              </tbody>
-    </table>";
-       /*echo "<tr>\n";
-           echo "<th>Article Title</th>\n";
-           echo "<th>Body Text</th>\n";
-           echo "<th>Published Timestamp</th>\n";
-           echo "<th>Comic URL</th>\n";
-       echo "</tr>\n";
-       echo "</thead>\n";*/
+              </tbody>";
+
 
 }
 
-function comment_table($row, $user)
-{
-    echo "<p></p>";
-    echo "
-                <tbody>
-                    <tr>
-                        <td>{$user['DisplayName']}</td>
-                        <td>{$row['CommentText']}</td>
-                        <td>{$row['Timestamp']}</td>
-                    </tr>";
-    /*echo "<tr class>\n";
-    echo "<td>";
-    echo "<table id = 'output' class = 'table table-striped' style = 'width: 100%'>\n";
-        echo "<thead>\n";
-            echo "<tr>\n";
-            echo "<th>User</th>\n";
-            echo "<th>Comment Text</th>\n";
-            echo "<th>TimeStamp</th>\n";
-            echo "</tr>\n";
-        echo "</thead>\n";*/
-}
 function display_user_rows($row, $userComments)
 {
     echo "<tr>
@@ -124,33 +64,30 @@ function display_user_rows($row, $userComments)
                         <th>Comment Text</th>
                         <th>Timestamp</th>
                     </tr>
-                </thead>";
+                </thead>
+       <tbody>";
 
 
 
+
+}
+
+
+function display_comment_rows($user, $row)
+{
+    echo "
+                
+                    <tr>
+                        <td>{$user['DisplayName']}</td>
+                        <td>{$row['CommentText']}</td>
+                        <td>{$row['Timestamp']}</td>
+                    </tr>";
 }
 
 function open_user_table()
 {
-    echo "<tr> 
-    <h6>Users who Commented on this Story</h6>
-    <table  id = 'user' class='table table-sm table-striped table-bordered w-75'>
-                <thead>
-                    <tr>
-                        <th>Display Name</th>
-                        <th>Role</th>
-                        <th>Subscription Status</th>
-                        <th>Email</th>
-                        <th>Date Joined</th>
-                    </tr>
-                </thead>";
-}
-
-function user_table($row)
-{
-    echo "<tr> 
-    <h6>User Information</h6>
-    <table  id = 'user' class='table table-sm table-striped table-bordered w-75'>
+    echo "<h6>Users who Commented on this Story</h6>
+    <table id = 'user' class='table table-sm table-striped table-bordered w-75'>
                 <thead>
                     <tr>
                         <th>Display Name</th>
@@ -160,41 +97,18 @@ function user_table($row)
                         <th>Date Joined</th>
                     </tr>
                 </thead>
-               <tr>
-                    <td>{$row['DisplayName']}</td>
-                    <td>{$row['Role']}</td>
-                    <td>{$row['SubscriptionStatus']}</td>
-                    <td>{$row['Email']}</td>
-                    <td>{$row['DateJoined']}</td>
-                </tr>
-              </table id = 'user'></tr>";
+                <tbody>";
 }
 
-function comment_table_open()
-{
-    echo "<h6>Article Comments</h6>";
-    echo "<table  id = 'comment' class='table table-sm table-striped table-bordered w-50 mb-3'>
-                <thead>
-                    <tr>
-                        <th>User</th>
-                        <th>Comment Text</th>
-                        <th>Timestamp</th>
-                    </tr>
-                </thead>";
-}
 function output_table_close()
 {
     echo "</div>";
 }
-
-function comment_table_close()
+function close_user_table()
 {
-    echo "</tbody>\n";
-    echo "</table>\n";
+    echo "</tr></table id = 'comment'>";
+    echo "</tr></table id = 'user'>";
 }
-
-
-// Here is where stuff may need to be changed
 
 //If there's a connection error, display it
 if($connection_error)
@@ -234,9 +148,6 @@ else
             // Get the StoryID and save it
             $story_id = $row[0];
 
-
-
-
             // Run a subquery and find all unique users who commented on this story
             $unique_users = $conn->prepare('SELECT DISTINCT UserID FROM comment WHERE StoryID = ?');
             $unique_users->bind_param("i", $story_id);
@@ -244,70 +155,44 @@ else
             $unique_users_result = $unique_users->get_result();
 
             // If there are results
-            if(mysqli_num_rows($unique_users_result) > 0)
-            {
-                echo "<p> Found at least one user</p>";
+            if(mysqli_num_rows($unique_users_result) > 0) {
 
                 open_user_table();
 
-                $users = $conn->prepare('SELECT * FROM user WHERE UserID = ?');
-                $users->bind_param("i", $user_id);
-                $users->execute();
-                $user_results = $users->get_result();
 
-                $user_comments = $conn->prepare('SELECT * FROM comment INNER JOIN user WHERE comment.UserID = user.userID AND comment.StoryID = ?');
-                $user_comments->bind_param("i", $story_id);
-                $user_comments->execute();
-                $user_comments_result = $user_comments->get_result();
+                foreach ($unique_users_result as $user) {
 
-                foreach($user_results as $curr_user)
-                {
-                    display_user_rows($curr_user, $user_comments);
-                }
-                /*
-                comment_table_open();
+                    $users = $conn->prepare('SELECT * FROM user WHERE UserID = ?');
+                    $users->bind_param("i", $user['UserID']);
+                    $users->execute();
+                    $user_results = $users->get_result();
 
 
-                foreach($unique_users_result as $comment)
-                {
-                // While there are results from $subquery
-                    //Output the data from this current row. The IDs are there to prevent data shifting errors
+                    $user_comments = $conn->prepare('SELECT * FROM comment WHERE UserID = ? AND StoryID = ?');
+                    $user_comments->bind_param("ii", $user['UserID'], $story_id);
+                    $user_comments->execute();
+                    $user_comments_result = $user_comments->get_result();
 
-
-
-                    $user_query = $conn->prepare('SELECT * FROM user WHERE UserID = ?');
-                    $user_query->bind_param("i", $comment['UserID']);
-                    $user_query->execute();
-                    $user = $user_query->get_result();
-
-                    if(mysqli_num_rows($user) > 0)
+                    while ($user1 = $user_results->fetch_assoc())
                     {
+                        display_user_rows($user1, $user_comments);
 
-                        foreach($user as $userRow)
+                        while($comment1 = $user_comments_result->fetch_assoc())
                         {
-                            comment_table($comment, $userRow);
-
-                            user_table($userRow);
+                            display_comment_rows($user1, $comment1);
                         }
 
                     }
-                    else
-                    {
-                        echo '<p>Cannot find users for comments with userID </p>';
 
-                    }
-
+                    close_user_table();
 
                 }
-
-                comment_table_close();*/
-
-
             }
             else
             {
-                echo "<p> No comments on this article </p>";
+                echo "<p> No users found!</p>";
             }
+
 
         }
 
