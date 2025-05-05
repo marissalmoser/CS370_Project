@@ -69,7 +69,7 @@ output_story_row("1", "Test Title1", "Test Body1", "2020-01-01");*/
 $connection_error = false;
 $connection_error_message = "";
 
-$conn = mysqli_connect('localhost', 'root', 'SQLP@ss', 'news');
+$conn = mysqli_connect('localhost', 'root', 'root3', 'news');
 
 if(!$conn)
 {
@@ -90,7 +90,7 @@ function story_table($row)
     echo "<div class = 'mb-4'>";
 
    echo "<table id = 'output' class = 'table table-bordered' style = 'width: 100%'>\n";
-    echo "<thead class='table-primary'>
+    echo "<thead class='table-info'>
                 <tr><th colspan='2'>Story Title: {$row[1]}</th></tr>
               </thead>\n";
     echo "<tbody>

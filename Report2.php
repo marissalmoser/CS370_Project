@@ -1,7 +1,20 @@
 <?php include 'header.php'; ?>
 
+<div class="bg-info-subtle p-4"> <br>
+    <div class="container hei">
+        <h1>Report 2: <small class="text-body-secondary">Story, Author, Tag, and Advertisement</small> </h1>
+        <br>
+        <p>This is the report 2 page. Here you can see story, author, tag, and advertisement data. It shows all stories and
+            whatever other data they have.</p>
+        <br>
+    </div>
+
+    <?php
+    include 'ReportsHeader.php';
+    ?>
+</div><br>
+
 <div class="container">
-    <h1 class="mb-4">Stories and Their Details</h1>
 
     <?php
     $conn = mysqli_connect("localhost", "root", "root3", "news");
