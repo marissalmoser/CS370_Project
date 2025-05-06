@@ -12,7 +12,7 @@
 
 <div class="container">
     <?php
-    $conn = mysqli_connect('localhost', 'root', 'rootpass', 'news');
+    $conn = mysqli_connect('localhost', 'root', 'root3', 'news');
     if (!$conn) {
         echo "<div class='alert alert-danger'>Connection Error: " . mysqli_connect_error() . "</div>";
     } else {
